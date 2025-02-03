@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          Role      @default(STUDENT)
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  student       Student?
+  teacher       Teacher?
+  parent        Parent?
+  posts         Post[]
+  comments      Comment[]
+  assignments   Assignment[]    @relation("AssignmentSubmissions")
+  grades        Grade[]
+  achievements  Achievement[]
+}
+
+model Student {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String    @unique @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id])
+  grade         Int
+  section       String
+  rollNumber    String    @unique
+  parentId      String?   @db.ObjectId
+  parent        Parent?   @relation(fields: [parentId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  enrollments   Enrollment[]
+  attendances   Attendance[]
+}
+
+model Teacher {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String    @unique @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id])
+  subjects      Subject[]
+  qualification String
+  experience    Int
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  courses       Course[]
+  assignments   Assignment[]    @relation("AssignmentCreator")
+}
+
+model Parent {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String    @unique @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id])
+  phone         String
+  address       String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  students      Student[]
+}
+
+model Course {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String
+  subjectId     String    @db.ObjectId
+  subject       Subject   @relation(fields: [subjectId], references: [id])
+  teacherId     String    @db.ObjectId
+  teacher       Teacher   @relation(fields: [teacherId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  enrollments   Enrollment[]
+  assignments   Assignment[]
+  lessons       Lesson[]
+}
+
+model Subject {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  code          String    @unique
+  description   String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  courses       Course[]
+  teachers      Teacher[]
+}
+
+model Enrollment {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  studentId     String    @db.ObjectId
+  student       Student   @relation(fields: [studentId], references: [id])
+  courseId      String    @db.ObjectId
+  course        Course    @relation(fields: [courseId], references: [id])
+  enrolledAt    DateTime  @default(now())
+  status        EnrollmentStatus @default(ACTIVE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Assignment {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String
+  dueDate       DateTime
+  courseId      String    @db.ObjectId
+  course        Course    @relation(fields: [courseId], references: [id])
+  teacherId     String    @db.ObjectId
+  teacher       Teacher   @relation("AssignmentCreator", fields: [teacherId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  submissions   User[]    @relation("AssignmentSubmissions")
+  grades        Grade[]
+}
+
+model Grade {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  value         Float
+  comment       String?
+  userId        String    @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id])
+  assignmentId  String    @db.ObjectId
+  assignment    Assignment @relation(fields: [assignmentId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Attendance {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  date          DateTime
+  status        AttendanceStatus
+  studentId     String    @db.ObjectId
+  student       Student   @relation(fields: [studentId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Lesson {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  content       String
+  courseId      String    @db.ObjectId
+  course        Course    @relation(fields: [courseId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Post {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  content       String
+  authorId      String    @db.ObjectId
+  author        User      @relation(fields: [authorId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  comments      Comment[]
+}
+
+model Comment {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  content       String
+  postId        String    @db.ObjectId
+  post          Post      @relation(fields: [postId], references: [id])
+  authorId      String    @db.ObjectId
+  author        User      @relation(fields: [authorId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Achievement {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String
+  date          DateTime
+  userId        String    @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id])
+  category      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
