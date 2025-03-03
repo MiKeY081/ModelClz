@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { getCourses, createCourse } from '../API/ApiResponse';
 import { Course } from '../types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const Courses: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -47,11 +48,7 @@ const Courses: React.FC = () => {
       </motion.h1>
 
       {loading ? (
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="w-16 h-16 border-4 border-t-transparent border-white rounded-full mx-auto"
-        />
+        <LoadingSpinner />
       ) : error ? (
         <p className="text-red-300 text-center">{error}</p>
       ) : (

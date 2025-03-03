@@ -1,129 +1,195 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Menu, X, GraduationCap, Bell, User } from 'lucide-react';
 import AuthModal from './AuthModal';
 import NotificationsModal from './NotificationsModal';
+import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  console.log(user, isAuthenticated);
+
+  // Sample notifications (replace with backend later if needed)
+  const notifications = [
+    { id: 1, type: 'event', title: 'Science Fair Tomorrow', message: 'Don\'t forget to attend at 9 AM.', time: '2 hours ago', read: false },
+    { id: 2, type: 'achievement', title: 'New Achievement Unlocked', message: 'Perfect Attendance badge earned!', time: '1 day ago', read: true },
+    { id: 3, type: 'assignment', title: 'New Assignment Posted', message: 'Math: Chapter 5 due next week.', time: '3 days ago', read: false },
+  ];
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Virtual Tour', href: '/virtual-tour' },
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Events', href: '/events' },
-    { name: 'Library', href: '/library' },
-    { name: 'Achievements', href: '/achievements' },
+    { name: 'Home', href: '/', public: true },
+    { name: 'Virtual Tour', href: '/virtual-tour', public: true },
+    { name: 'Dashboard', href: '/dashboard', public: false },
+    { name: 'Events', href: '/events', public: false },
+    { name: 'Library', href: '/library', public: false },
+    { name: 'Achievements', href: '/achievements', public: false },
   ];
 
-  const notifications = [
-    {
-      id: 1,
-      type: 'event',
-      title: 'Science Fair Tomorrow',
-      message: 'Don\'t forget to attend the annual Science Fair starting at 9 AM.',
-      time: '2 hours ago',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'achievement',
-      title: 'New Achievement Unlocked',
-      message: 'Congratulations! You\'ve earned the "Perfect Attendance" badge.',
-      time: '1 day ago',
-      read: true
-    },
-    {
-      id: 3,
-      type: 'assignment',
-      title: 'New Assignment Posted',
-      message: 'Mathematics: Chapter 5 Problems due next week.',
-      time: '3 days ago',
-      read: false
-    }
-  ];
+  const roleNavigation = {
+    ADMIN: [
+      { name: 'Students', href: '/students' },
+      { name: 'Courses', href: '/courses' },
+      { name: 'Attendance', href: '/attendance' },
+    ],
+    TEACHER: [
+      { name: 'Courses', href: '/courses' },
+      { name: 'Assignments', href: '/assignments' },
+      { name: 'Attendance', href: '/attendance' },
+    ],
+    STUDENT: [
+      { name: 'Assignments', href: '/assignments' },
+      { name: 'Grades', href: '/grades' },
+    ],
+    PARENT: [
+      { name: 'Students', href: '/students' },
+    ],
+  };
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
+  const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout(); // Just clears auth state—no navigation needed
+    setIsOpen(false); // Close mobile menu if open
+  };
+
+  const handleAuthToggle = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+    setShowAuthModal(true);
+    setIsOpen(false); // Close mobile menu if open
   };
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="bg-white shadow-lg sticky top-0 z-50"
+    >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link to="/" className="flex items-center">
-              <GraduationCap className="h-8 w-8 text-blue-600" />
+              <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
+                <GraduationCap className="h-8 w-8 text-blue-600" />
+              </motion.div>
               <span className="ml-2 text-xl font-bold text-gray-900">EduExcel</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:space-x-4">
-            {navigation.map((item) => (
+            {navigation
+              .filter(item => item.public || isAuthenticated)
+              .map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition ${
+                    isActive(item.href) ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:text-blue-600'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            {isAuthenticated && user && roleNavigation[user.role]?.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition ${
-                  isActive(item.href)
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                  isActive(item.href) ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:text-blue-600'
                 }`}
               >
                 {item.name}
               </Link>
             ))}
-            
-            {/* Notification and Profile */}
             <div className="flex items-center ml-4 space-x-4">
-              <button 
-                className="text-gray-700 hover:text-blue-600 transition relative"
-                onClick={() => setShowNotifications(true)}
-              >
-                <Bell className="h-5 w-5" />
-                {notifications.filter(n => !n.read).length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-xs flex items-center justify-center">
-                    {notifications.filter(n => !n.read).length}
-                  </span>
-                )}
-              </button>
-              <button 
-                className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition"
-                onClick={() => setShowAuthModal(true)}
-              >
-                <User className="h-5 w-5" />
-                <span className="text-sm font-medium">Login</span>
-              </button>
+              {isAuthenticated && (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  className="text-gray-700 hover:text-blue-600 transition relative"
+                  onClick={() => setShowNotifications(true)}
+                >
+                  <Bell className="h-5 w-5" />
+                  {notifications.filter(n => !n.read).length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-xs flex items-center justify-center">
+                      {notifications.filter(n => !n.read).length}
+                    </span>
+                  )}
+                </motion.button>
+              )}
+              {isAuthenticated ? (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="text-sm font-medium">Logout</span>
+                </motion.button>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleAuthToggle('login')}
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="text-sm font-medium">Login</span>
+                </motion.button>
+              )}
             </div>
           </div>
 
           {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 focus:outline-none"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <div className="md:hidden">
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          transition={{ duration: 0.3 }}
+          className="md:hidden"
+        >
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navigation.map((item) => (
+            {navigation
+              .filter(item => item.public || isAuthenticated)
+              .map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    isActive(item.href) ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:text-blue-600'
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            {isAuthenticated && user && roleNavigation[user.role]?.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive(item.href)
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                  isActive(item.href) ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:text-blue-600'
                 }`}
                 onClick={() => setIsOpen(false)}
               >
@@ -131,51 +197,62 @@ function Navbar() {
               </Link>
             ))}
             <div className="pt-4 border-t border-gray-200">
-              <button 
+              {isAuthenticated && (
+                <button
+                  className="w-full px-3 py-2 text-left text-base font-medium text-gray-700 hover:text-blue-600"
+                  onClick={() => {
+                    setShowNotifications(true);
+                    setIsOpen(false);
+                  }}
+                >
+                  <Bell className="h-5 w-5 inline mr-2" />
+                  Notifications
+                  {notifications.filter(n => !n.read).length > 0 && (
+                    <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                      {notifications.filter(n => !n.read).length}
+                    </span>
+                  )}
+                </button>
+              )}
+              <button
                 className="w-full px-3 py-2 text-left text-base font-medium text-gray-700 hover:text-blue-600"
                 onClick={() => {
-                  setShowNotifications(true);
-                  setIsOpen(false);
+                  if (isAuthenticated) {
+                    handleLogout();
+                  } else {
+                    handleAuthToggle('login');
+                  }
                 }}
               >
-                <Bell className="h-5 w-5 inline mr-2" />
-                Notifications
-                {notifications.filter(n => !n.read).length > 0 && (
-                  <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
-                    {notifications.filter(n => !n.read).length}
-                  </span>
-                )}
+                <User className="h-5 w-5 inline mr-2" />
+                {isAuthenticated ? 'Logout' : 'Login'}
               </button>
-              <button 
-                className="w-full px-3 py-2 text-left text-base font-medium text-gray-700 hover:text-blue-600"
-                onClick={() => {
-                  setShowAuthModal(true);
-                  setIsOpen(false);
-                }}
-              >
-                <User className="h-5 w-5 inline mr-2" onClick={setShowAuthModal(!showAuthModal)} />
-                Login
-              </button>
+              {!isAuthenticated && (
+                <button
+                  className="w-full px-3 py-2 text-left text-base font-medium text-gray-700 hover:text-blue-600"
+                  onClick={() => handleAuthToggle('register')}
+                >
+                  <UserPlus className="h-5 w-5 inline mr-2" />
+                  Register
+                </button>
+              )}
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      
       <NotificationsModal
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
         notifications={notifications}
       />
 
-      {/* Modals */}
-      {/* <AuthModal
+      <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        mode="login"
-      /> */}
-
-    </nav>
+        mode={authMode}
+      />
+    </motion.nav>
   );
 }
 
