@@ -1,6 +1,6 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:5002/api';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -68,7 +68,8 @@ export const register = async (data: { email: string; password: string; firstNam
 export const login = async (data: { email: string; password: string }) => {
   try {
     const response: AxiosResponse<ApiResponse<{ user: User; token: string }>> = await api.post('/auth/login', data);
-    if (response.data.data.token) localStorage.setItem('token', response.data.data.token);
+    console.log(response)
+    if (response.data.token) localStorage.setItem('token', response.data.token);
     return response.data;
   } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
 };

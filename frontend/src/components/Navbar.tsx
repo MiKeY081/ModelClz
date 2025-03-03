@@ -153,7 +153,7 @@ function Navbar() {
                   setIsOpen(false);
                 }}
               >
-                <User className="h-5 w-5 inline mr-2" />
+                <User className="h-5 w-5 inline mr-2" onClick={setShowAuthModal(!showAuthModal)} />
                 Login
               </button>
             </div>
@@ -161,17 +161,20 @@ function Navbar() {
         </div>
       )}
 
-      {/* Modals */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        mode="login"
-      />
+      
       <NotificationsModal
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
         notifications={notifications}
       />
+
+      {/* Modals */}
+      {/* <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        mode="login"
+      /> */}
+
     </nav>
   );
 }

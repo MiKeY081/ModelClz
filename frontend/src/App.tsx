@@ -15,6 +15,10 @@ import Grades from './pages/Grades';
 import Community from './pages/Community';
 import ChatAssistant from './components/ChatAssistant';
 import ApplicationForm from './pages/ApplicationForm';
+import Courses from './pages/Courses';
+import Students from './pages/Students';
+import Attendance from './pages/Attendance';
+
 
 function App() {
   return (
@@ -35,6 +39,9 @@ function App() {
             <Route path="/grades" element={<Grades />} />
             <Route path="/community" element={<Community />} />
             <Route path="/apply" element={<ApplicationForm />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/students" element={<Students />} />
+            <Route path="/attendance" element={<Attendance />} />
           </Routes>
         </main>
         <ChatAssistant />
