@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
+  url      = env("MONGODB_URL")
 }
 
 model User {
@@ -24,7 +24,7 @@ model User {
   parent        Parent?
   posts         Post[]
   comments      Comment[]
-  assignments   Assignment[]    @relation("AssignmentSubmissions")
+  submissions   AssignmentSubmission[]
   grades        Grade[]
   achievements  Achievement[]
 }
@@ -50,13 +50,13 @@ model Teacher {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   userId        String    @unique @db.ObjectId
   user          User      @relation(fields: [userId], references: [id])
-  subjects      Subject[]
   qualification String
   experience    Int
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   // Relations
+  teacherSubjects TeacherSubject[]
   courses       Course[]
   assignments   Assignment[]    @relation("AssignmentCreator")
 }
@@ -100,8 +100,8 @@ model Subject {
   updatedAt     DateTime  @updatedAt
 
   // Relations
+  teacherSubjects TeacherSubject[]
   courses       Course[]
-  teachers      Teacher[]
 }
 
 model Enrollment {
@@ -129,7 +129,7 @@ model Assignment {
   updatedAt     DateTime  @updatedAt
 
   // Relations
-  submissions   User[]    @relation("AssignmentSubmissions")
+  submissions   AssignmentSubmission[]
   grades        Grade[]
 }
 
@@ -199,6 +199,28 @@ model Achievement {
   category      String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+// New intermediate models for many-to-many relationships
+model AssignmentSubmission {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String     @db.ObjectId
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  assignmentId String     @db.ObjectId
+  submittedAt  DateTime   @default(now())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model TeacherSubject {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  teacher      Teacher    @relation(fields: [teacherId], references: [id])
+  teacherId    String     @db.ObjectId
+  subject      Subject    @relation(fields: [subjectId], references: [id])
+  subjectId    String     @db.ObjectId
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
 enum Role {
