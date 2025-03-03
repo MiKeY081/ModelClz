@@ -11,6 +11,7 @@ import attendanceRoutes from './routes/assignmentRoutes';
 import gradeRoutes from './routes/gradeRoutes';
 import postRoutes from './routes/postRoutes';
 import achievementRoutes from './routes/achievementRoutes';
+import { errorHandler, notFound } from './middleware/errorMiddleware';
 
 dotenv.config();
 
@@ -22,6 +23,9 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
+app.get('/api', (req, res) => {
+  res.send('API is running smoothly');
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
@@ -32,8 +36,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/achievements', achievementRoutes);
 
 // Error Handling
-// app.use(notFound);
-// app.use(errorHandler);
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5002;
 
