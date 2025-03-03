@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Calendar, Clock, CheckCircle, XCircle, AlertCircle, Filter, Search, ChevronDown, Upload } from 'lucide-react';
+import { FileText, Calendar, Clock, CheckCircle, XCircle, AlertCircle, Filter, Search, ChevronDown, Upload, Star } from 'lucide-react';
 
 interface Assignment {
   id: number;

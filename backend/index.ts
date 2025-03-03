@@ -12,6 +12,15 @@ import gradeRoutes from './routes/gradeRoutes';
 import postRoutes from './routes/postRoutes';
 import achievementRoutes from './routes/achievementRoutes';
 import { errorHandler, notFound } from './middleware/errorMiddleware';
+import {studentRoutes} from './routes/studentRoutes';
+import {teacherRoutes} from './routes/teacherRoutes';
+import {parentRoutes} from './routes/parentRoutes';
+import {subjectRoutes} from './routes/subjectRoutes';
+import {enrollmentRoutes} from './routes/enrollmentRoutes';
+import {lessonRoutes} from './routes/lessonRoutes';
+import {commentRoutes} from './routes/commentRoutes';
+import {submissionRoutes} from './routes/submissionRoutes';
+import {teacherSubjectRoutes} from './routes/teacherSubjectRoutes';
 
 dotenv.config();
 
@@ -34,6 +43,18 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/grades', gradeRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/achievements', achievementRoutes);
+
+// New routes
+app.use('/api/students', studentRoutes);
+app.use('/api/teachers', teacherRoutes);
+app.use('/api/parents', parentRoutes);
+app.use('/api/subjects', subjectRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/lessons', lessonRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/submissions', submissionRoutes);
+app.use('/api/teacher-subjects', teacherSubjectRoutes);
+
 
 // Error Handling
 app.use(notFound);
