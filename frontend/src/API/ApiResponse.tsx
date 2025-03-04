@@ -1,6 +1,11 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
 
-const BASE_URL = 'http://localhost:5002/api';
+
+const BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:5002/api"
+    : "https://model-clz-server.vercel.app/api";
+
 
 
 interface ApiResponse<T> {

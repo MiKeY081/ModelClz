@@ -28,7 +28,10 @@ const app = express();
 // Middleware
 app.use(cors(
   {
-    origin: 'http://localhost:5173',
+    origin:[
+      "http://localhost:3000",
+      "https://model-clz.vercel.app/"
+  ],
     credentials: true
   }
 ));
