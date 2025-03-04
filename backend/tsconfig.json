@@ -3,8 +3,7 @@
     "target": "ES6",                    // Target ECMAScript version
     "module": "commonjs",               // Module system
     "moduleResolution": "node",         // How to resolve modules
-    "esModuleInterop": true,            // Ensures compatibility with ES modules
-    "allowImportingTsExtensions": true, // Allow imports with .ts extensions
+    "esModuleInterop": true, 
     "outDir": "./dist",                 // Output directory for compiled JavaScript
     "rootDir": ".",                     // Root directory for source files
     "strict": true                      // Enable strict type checking
