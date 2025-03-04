@@ -6,13 +6,14 @@ const prisma = new PrismaClient();
 // Create an assignment
 export const createAssignment = async (req: Request, res: Response) => {
   const { title, description, dueDate, courseId, teacherId } = req.body;
+  
   try {
     const assignment = await prisma.assignment.create({
-      data: { title, description, dueDate, courseId, teacherId },
+      data: { title, description, dueDate: new Date(dueDate), courseId, teacherId },
     });
     res.status(201).json(assignment);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create assignment' });
+    res.status(500).json({ error });
   }
 };
 

@@ -36,7 +36,7 @@ function AuthModal({ isOpen, onClose, mode, onToggleMode }: AuthModalProps) {
         console.log('Login response:', response);
         const userData: User = response || response.data;
         setUser(userData);
-        navigate('/dashboard');
+        navigate('/');
       } else {
         const registerResponse = await register({ email, password, firstName, lastName, role });
         console.log('Register response:', registerResponse);
@@ -44,7 +44,7 @@ function AuthModal({ isOpen, onClose, mode, onToggleMode }: AuthModalProps) {
         console.log('Login after register:', loginResponse);
         const userData: User = loginResponse || loginResponse.data;
         setUser(userData);
-        navigate('/dashboard');
+        navigate('/');
       }
       onClose();
     } catch (err) {

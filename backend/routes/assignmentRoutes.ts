@@ -1,9 +1,10 @@
 import express from 'express';
 import { createAssignment, getAssignments, getAssignmentById, updateAssignment, deleteAssignment } from '../controllers/assignmentController'
+import { protect } from '../middleware/authMiddleware';
 const router = express.Router();
 
 // Create an assignment
-router.post('/', createAssignment);
+router.post('/',  createAssignment);
 
 // Get all assignments
 router.get('/', getAssignments);

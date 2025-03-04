@@ -32,6 +32,8 @@ import Support from './pages/Support';
 import SupportFAQ from './pages/SupportFAQ';
 import SupportContact from './pages/SupportContact';
 import SupportFeedback from './pages/SupportFeedback';
+import Profile from './pages/Profile';
+import UpdateProfile from './pages/UpdateProfile';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -49,6 +51,9 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/virtual-tour" element={<VirtualTour />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/profile/update" element={<ProtectedRoute><UpdateProfile /></ProtectedRoute>} />
+
               <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
               <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
               <Route path="/library/my-library" element={<ProtectedRoute><MyLibrary /></ProtectedRoute>} />

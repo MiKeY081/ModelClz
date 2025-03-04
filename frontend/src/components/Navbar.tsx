@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import  { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, GraduationCap, Bell, User } from 'lucide-react';
+import { Menu, X, GraduationCap, Bell, User, LogOut, UserRound } from 'lucide-react';
 import AuthModal from './AuthModal';
 import NotificationsModal from './NotificationsModal';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,7 @@ function Navbar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log('Navbar auth state:', { user, isAuthenticated });
@@ -49,7 +50,6 @@ function Navbar() {
       { name: 'Grades', href: '/grades' },
     ],
     PARENT: [
-      { name: 'Students', href: '/students' },
     ],
   };
 
@@ -129,15 +129,26 @@ function Navbar() {
                 </motion.button>
               )}
               {isAuthenticated ? (
+                <>
+              
+
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={handleLogout}
+                  
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition rounded-full border-2 border-gray-700 hover:border-blue-600"
+                >
+                  <UserRound  onClick={ ()=>{navigate('/profile')}} className="h-5 w-5 rounded-full border-1 border-black" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  
                   className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition"
                 >
-                  <User className="h-5 w-5" />
-                  <span className="text-sm font-medium">Logout</span>
+                  <LogOut className="text-sm font-medium onClick={handleLogout}"/>
                 </motion.button>
+                </>
               ) : (
                 <motion.button
                   whileHover={{ scale: 1.1 }}

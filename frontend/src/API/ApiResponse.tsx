@@ -697,3 +697,17 @@ export const markMessagesAsRead = async () => {
   console.log('Marked all as read');
   return { success: true };
 };
+
+export const linkStudentToParent = async (studentId: string) => {
+  const token = localStorage.getItem('token');
+  const response: AxiosResponse<ApiResponse<null>> = await api.post(`/parents/link-student${studentId}`);
+
+  return response.data;
+};
+
+export const createUser =  async (userData: any) => {
+  const token = localStorage.getItem('token');
+  const response: AxiosResponse<ApiResponse<null>> = await api.post(`/users`, userData);
+
+  return response.data;
+};
