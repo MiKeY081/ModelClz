@@ -30,7 +30,7 @@ app.use(cors(
   {
     origin:[
       "http://localhost:3000",
-      "https://model-clz.vercel.app/"
+      "https://homie-clz.vercel.app/"
   ],
     credentials: true
   }
