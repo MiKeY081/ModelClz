@@ -202,9 +202,10 @@ const Community: React.FC = () => {
                         <span key={index} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">#{tag}</span>
                       ))}
                     </div>
-                    <div className="flex items-center gap-6 mt-4 pt-4 border-t">
-                      <Button onClick={() => handleLikePost(post.id)} className="flex items-center gap-2 bg-transparent text-gray-600 hover:text-blue-600">
-                        <Heart className="w-5 h-5" /> {post.likes || 0}
+                    <div className="flex items-center gap-6 mt-4 pt-4 border-t text-gray-600">
+                      <Button onClick={() => handleLikePost(post.id)} className="flex items-center gap-2 bg-transparent  text-gray-600 hover:text-blue-600">
+                        <Heart className="w-5 h-5 text-gray-600" /> 
+                        <p className='text-gray-600'>{post.likes || 0}</p>
                       </Button>
                       <div className="flex items-center gap-2 text-gray-600">
                         <MessageSquare className="w-5 h-5" /> {post.comments?.length || 0}

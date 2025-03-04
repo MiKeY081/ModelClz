@@ -7,7 +7,7 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import courseRoutes from './routes/courseRoutes';
 import assignmentRoutes from './routes/assignmentRoutes';
-import attendanceRoutes from './routes/assignmentRoutes';
+import attendanceRoutes from './routes/attendenceRoutes';
 import gradeRoutes from './routes/gradeRoutes';
 import postRoutes from './routes/postRoutes';
 import achievementRoutes from './routes/achievementRoutes';

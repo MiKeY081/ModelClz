@@ -59,7 +59,7 @@ async function seed() {
       { userId: studentUsers.find(u => u.email === "nisha.homie@homie.edu.np").id, grade: 12, section: "B", rollNumber: "RN105", address: "Thamel, Kathmandu", parentId: parentUsers.find(p => p.email === "radha.homie@homie.edu.np").id, createdAt: new Date(), updatedAt: new Date() },
     ];
     await prisma.student.createMany({ data: students });
-    const createdStudents = await prisma.student.findMany();
+     const createdStudents = await prisma.student.findMany();
 
     // Seed Teachers (5)
     const teachers = [

@@ -80,7 +80,7 @@ const Attendance: React.FC = () => {
                 <p className="text-lg font-semibold text-orange-700">
                   Student ID: {record.studentId}
                 </p>
-                <p className="text-gray-600">{new Date(record.date).toLocaleDateString()}</p>
+                <p className="text-gray-600">{record?.date.split("T")[0]}</p>
               </div>
               <motion.span
                 animate={{ scale: record.status === 'PRESENT' ? [1, 1.2, 1] : 1 }}
