@@ -62,7 +62,6 @@ export const getCourse = async (req: Request, res: Response) => {
         }
       },
       assignments: true,
-      lessons: true
     }
   });
 

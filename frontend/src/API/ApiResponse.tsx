@@ -43,7 +43,6 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
-  console.log('Request headers:', config.headers); // Debug
   return config;
 });
 
@@ -70,7 +69,6 @@ export const register = async (data: { email: string; password: string; firstNam
 export const login = async (data: { email: string; password: string }) => {
   try {
     const response: AxiosResponse<ApiResponse<{ user: User; token: string }>> = await api.post('/auth/login', data);
-    console.log(response)
     if (response.data.token) localStorage.setItem('token', response.data.token);
     return response.data;
   } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
@@ -274,6 +272,11 @@ export const updatePost = async (id: string, data: Partial<Post>) => {
   } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
 };
 
+export const likePost = async (postId: string) => {
+  const response: AxiosResponse<ApiResponse<Post>> = await api.put(`/posts/${postId}/like`);
+  return response.data;
+};
+
 export const deletePost = async (id: string) => {
   try {
     const response: AxiosResponse<ApiResponse<null>> = await api.delete(`/posts/${id}`);
@@ -330,7 +333,6 @@ export const getStudents = async () => {
 export const createStudent = async (data: { firstName: string; lastName: string; rollNumber: string; grade: number; section: string; parentId?: string }) => {
   try {
     const response = await api.post('/students', data);
-    console.log('Create student response:', response);
     return response.data;
   } catch (error) {
     handleError(error as AxiosError<ErrorResponse>);

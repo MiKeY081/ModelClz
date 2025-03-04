@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Calendar, Clock, CheckCircle, XCircle, AlertCircle, Filter, Search, ChevronDown, Upload, Star } from 'lucide-react';
 import { getAssignments } from '@/API/ApiResponse';
+import { p } from 'framer-motion/client';
 
 interface Assignment {
   id: number;
@@ -24,7 +25,6 @@ function Assignments() {
       try {
         const response = await getAssignments(); // No need for Promise.resolve
         setAssignments(response);
-        console.log(response);
       } catch (err) {
         console.error("Error fetching assignments:", err);
       }
@@ -33,43 +33,11 @@ function Assignments() {
     fetchData();
   }, []); // Runs only once on mount
   
-  // const assignments: Assignment[] = [
-  //   {
-  //     id: 1,
-  //     title: "Advanced Calculus Problem Set",
-  //     subject: "Mathematics",
-  //     description: "Complete problems 1-20 from Chapter 5: Differential Equations",
-  //     dueDate: "2024-03-20",
-  //     status: "pending",
-  //     type: "homework",
-  //     points: 100
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Physics Lab Report: Wave Motion",
-  //     subject: "Physics",
-  //     description: "Write a detailed report on the wave motion experiments conducted in lab",
-  //     dueDate: "2024-03-18",
-  //     status: "completed",
-  //     type: "project",
-  //     points: 150
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Literature Analysis Essay",
-  //     subject: "English",
-  //     description: "Write a 1000-word analysis of Shakespeare's Macbeth",
-  //     dueDate: "2024-03-15",
-  //     status: "overdue",
-  //     type: "homework",
-  //     points: 100
-  //   }
-  // ];
 
-  const filteredAssignments = assignments.filter(assignment => 
+  const filteredAssignments = assignments?.filter(assignment => 
     (filter === 'all' || assignment.status === filter) &&
-    (assignment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     assignment.subject.toLowerCase().includes(searchQuery.toLowerCase()))
+    (assignment?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     assignment?.description?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -121,20 +89,20 @@ function Assignments() {
             label="All"
           />
           <FilterButton
-            active={filter === 'pending'}
-            onClick={() => setFilter('pending')}
+            active={filter === 'PENDING'}
+            onClick={() => setFilter('PENDING')}
             icon={<Clock className="w-4 h-4" />}
             label="Pending"
           />
           <FilterButton
-            active={filter === 'completed'}
-            onClick={() => setFilter('completed')}
+            active={filter === 'COMPLETED'}
+            onClick={() => setFilter('COMPLETED')}
             icon={<CheckCircle className="w-4 h-4" />}
             label="Completed"
           />
           <FilterButton
-            active={filter === 'overdue'}
-            onClick={() => setFilter('overdue')}
+            active={filter === 'OVERDUE'}
+            onClick={() => setFilter('OVERDUE')}
             icon={<AlertCircle className="w-4 h-4" />}
             label="Overdue"
           />
@@ -185,6 +153,7 @@ function AssignmentCard({ assignment }: { assignment: Assignment }) {
     overdue: <XCircle className="w-4 h-4" />
   };
 
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false)
   return (
     <motion.div
       whileHover={{ y: -2 }}
@@ -217,13 +186,30 @@ function AssignmentCard({ assignment }: { assignment: Assignment }) {
           </div>
         </div>
 
-        <div className="mt-4 flex gap-2">
-          <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-            View Details
+        <div className="mt-4 flex gap-2 flex-col">
+          <button onClick={()=>setIsDescriptionOpen(!isDescriptionOpen)} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            {
+              !isDescriptionOpen? <p>View details</p>: <p>Show less</p>
+            }
           </button>
-          {assignment.status === 'pending' && (
+           {/* Conditionally render the description */}
+        {isDescriptionOpen && (
+          <div className="mt-4 p-4 bg-gray-200 rounded-lg">
+            <h3 className="text-xl font-semibold">Description</h3>
+              {assignment.description? 
+              <p className="mt-2">
+                {assignment.description}
+                </p>
+                :
+                <p className="mt-2">
+                  No description
+                  </p>
+              }
+          </div>
+        )}
+          {assignment?.status === 'PENDING' && (
             <button className="px-4 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition">
-              Submit
+              Confirm Submitted
             </button>
           )}
         </div>

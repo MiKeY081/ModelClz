@@ -15,6 +15,9 @@ model User {
   lastName      String
   role          Role      @default(STUDENT)
   avatar        String?
+  bio           String?   // For profile page
+  phone         String?   // Added for Nepali context
+  address       String?   // Added for Nepali context
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -27,15 +30,18 @@ model User {
   submissions   AssignmentSubmission[]
   grades        Grade[]
   achievements  Achievement[]
+
 }
 
 model Student {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   userId        String    @unique @db.ObjectId
   user          User      @relation(fields: [userId], references: [id])
-  grade         Int
-  section       String
+  grade         Int?      // Optional for flexibility
+  section       String?   // Optional
   rollNumber    String    @unique
+  address       String?   // Moved from User for student-specific
+  phoneNumber   String?   // Renamed for consistency
   parentId      String?   @db.ObjectId
   parent        Parent?   @relation(fields: [parentId], references: [id])
   createdAt     DateTime  @default(now())
@@ -43,7 +49,7 @@ model Student {
 
   // Relations
   enrollments   Enrollment[]
-  attendances   Attendance[]
+  attendances   Attendance[]  // Fixed: removed redundant 'attendance'
 }
 
 model Teacher {
@@ -52,21 +58,24 @@ model Teacher {
   user          User      @relation(fields: [userId], references: [id])
   qualification String
   experience    Int
+  address       String?   // Moved from User for teacher-specific
+  phoneNumber   String?   // Renamed for consistency
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   // Relations
   teacherSubjects TeacherSubject[]
-  courses       Course[]
-  assignments   Assignment[]    @relation("AssignmentCreator")
+  courses         Course[]
+  assignments     Assignment[]    @relation("AssignmentCreator")
+  attendances     Attendance[]    @relation("TeacherAttendance") // Added relation
 }
 
 model Parent {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   userId        String    @unique @db.ObjectId
   user          User      @relation(fields: [userId], references: [id])
-  phone         String
-  address       String
+  phone         String?   // Kept optional
+  address       String?   // Kept optional
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -88,7 +97,6 @@ model Course {
   // Relations
   enrollments   Enrollment[]
   assignments   Assignment[]
-  lessons       Lesson[]
 }
 
 model Subject {
@@ -100,6 +108,7 @@ model Subject {
   updatedAt     DateTime  @updatedAt
 
   // Relations
+  grades        Grade[]
   teacherSubjects TeacherSubject[]
   courses       Course[]
 }
@@ -119,8 +128,10 @@ model Enrollment {
 model Assignment {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   title         String
-  description   String
+  description   String?
   dueDate       DateTime
+  status        AssignmentStatus @default(PENDING)
+
   courseId      String    @db.ObjectId
   course        Course    @relation(fields: [courseId], references: [id])
   teacherId     String    @db.ObjectId
@@ -130,7 +141,6 @@ model Assignment {
 
   // Relations
   submissions   AssignmentSubmission[]
-  grades        Grade[]
 }
 
 model Grade {
@@ -139,8 +149,8 @@ model Grade {
   comment       String?
   userId        String    @db.ObjectId
   user          User      @relation(fields: [userId], references: [id])
-  assignmentId  String    @db.ObjectId
-  assignment    Assignment @relation(fields: [assignmentId], references: [id])
+  subjectId     String    @db.ObjectId
+  subject       Subject   @relation(fields: [subjectId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -151,30 +161,22 @@ model Attendance {
   status        AttendanceStatus
   studentId     String    @db.ObjectId
   student       Student   @relation(fields: [studentId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-model Lesson {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  title         String
-  content       String
-  courseId      String    @db.ObjectId
-  course        Course    @relation(fields: [courseId], references: [id])
+  teacherId     String    @db.ObjectId  // Fixed: Added proper relation
+  teacher       Teacher   @relation("TeacherAttendance", fields: [teacherId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
 
 model Post {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  title         String
   content       String
+  image         String?
+  tags          String[]
+  likes         Int       @default(0)
   authorId      String    @db.ObjectId
   author        User      @relation(fields: [authorId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
-  // Relations
   comments      Comment[]
 }
 
@@ -194,6 +196,7 @@ model Achievement {
   title         String
   description   String
   date          DateTime
+  validated     Boolean   @default(false)
   userId        String    @db.ObjectId
   user          User      @relation(fields: [userId], references: [id])
   category      String
@@ -201,7 +204,6 @@ model Achievement {
   updatedAt     DateTime  @updatedAt
 }
 
-// New intermediate models for many-to-many relationships
 model AssignmentSubmission {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   user         User       @relation(fields: [userId], references: [id])
@@ -240,4 +242,10 @@ enum AttendanceStatus {
   PRESENT
   ABSENT
   LATE
+}
+
+enum AssignmentStatus {
+  PENDING
+  COMPLETED
+  OVERDUE
 }

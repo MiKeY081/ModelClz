@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 // Create a grade
 export const createGrade = async (req: Request, res: Response) => {
-  const { userId, assignmentId, value, comment } = req.body;
+  const { userId, subjectId, value, comment } = req.body;
   try {
     const grade = await prisma.grade.create({
-      data: { userId, assignmentId, value, comment },
+      data: { userId, subjectId,  value, comment },
     });
     res.status(201).json(grade);
   } catch (error) {

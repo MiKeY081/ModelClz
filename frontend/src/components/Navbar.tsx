@@ -15,10 +15,6 @@ function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log('Navbar auth state:', { user, isAuthenticated });
-  }, [user, isAuthenticated]);
-
   const notifications = [
     { id: 1, type: 'event', title: 'Science Fair Tomorrow', message: 'Don\'t forget to attend at 9 AM.', time: '2 hours ago', read: false },
     { id: 2, type: 'achievement', title: 'New Achievement Unlocked', message: 'Perfect Attendance badge earned!', time: '1 day ago', read: true },
@@ -138,7 +134,15 @@ function Navbar() {
                   
                   className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition rounded-full border-2 border-gray-700 hover:border-blue-600"
                 >
-                  <UserRound  onClick={ ()=>{navigate('/profile')}} className="h-5 w-5 rounded-full border-1 border-black" />
+                 { 
+                 user?.avatar ? 
+                  <img
+                    src = {user.avatar}
+                    className='h-6 w-6 rounded-full'
+                    onClick={ ()=>{navigate('/profile')}}
+                    />
+                    :
+                  <UserRound  onClick={ ()=>{navigate('/profile')}} className="h-5 w-5 rounded-full border-1 border-black" />}
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
@@ -146,7 +150,7 @@ function Navbar() {
                   
                   className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition"
                 >
-                  <LogOut className="text-sm font-medium onClick={handleLogout}"/>
+                  <LogOut className="text-sm font-medium"  onClick={handleLogout}/>
                 </motion.button>
                 </>
               ) : (
