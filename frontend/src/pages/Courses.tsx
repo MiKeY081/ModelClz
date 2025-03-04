@@ -15,7 +15,7 @@ const Courses: React.FC = () => {
       try {
         setLoading(true);
         const response = await getCourses();
-        setCourses(response.data);
+        setCourses(response);
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -48,38 +48,50 @@ const Courses: React.FC = () => {
       </motion.h1>
 
       {loading ? (
-        <LoadingSpinner />
-      ) : error ? (
-        <p className="text-red-300 text-center">{error}</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course, index) => (
-            <motion.div
-              key={course.id}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ scale: 1.05, rotate: 2 }}
-              className="bg-white rounded-lg shadow-xl p-6 cursor-pointer"
-            >
-              <motion.h2
-                initial={{ x: -20 }}
-                animate={{ x: 0 }}
-                className="text-xl font-semibold text-indigo-700"
-              >
-                {course.name}
-              </motion.h2>
-              <p className="mt-2 text-gray-600">{course.description}</p>
-              <motion.div
-                whileHover={{ x: 10 }}
-                className="mt-4 text-sm text-indigo-500"
-              >
-                Teacher ID: {course.teacherId}
-              </motion.div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+  <LoadingSpinner />
+) : error ? (
+  <p className="text-red-300 text-center">{error}</p>
+) : (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+    {courses && courses.length > 0 ? (
+      courses.map((course, index) => (
+        <motion.div
+          key={course.id}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          whileHover={{ scale: 1.05, rotate: 2 }}
+          className="bg-white rounded-lg shadow-xl p-6 cursor-pointer"
+        >
+          <motion.h2
+            initial={{ x: -20 }}
+            animate={{ x: 0 }}
+            className="text-xl font-semibold text-indigo-700"
+          >
+            {course.name}
+          </motion.h2>
+          <p className="mt-2 text-gray-600">{course.description}</p>
+          <motion.div
+            whileHover={{ x: 10 }}
+            className="mt-4 text-sm text-indigo-500"
+          >
+            Teacher ID: {course.teacherId}
+          </motion.div>
+        </motion.div>
+      ))
+    ) : (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white rounded-lg shadow-xl p-6 justify-center flex flex-col items-center"
+      >
+        <p className="text-gray-500 text-center">No courses found.</p>
+      </motion.div>
+    )}
+  </div>
+)}
+
 
       <motion.form
         initial={{ opacity: 0, y: 50 }}

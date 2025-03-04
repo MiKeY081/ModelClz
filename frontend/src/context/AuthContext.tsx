@@ -21,7 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (token && !user) { // Only fetch if token exists and user isn’t set
         try {
           const response = await getProfile();
-          setUser(response.data);
+          setUser(response);
           setIsAuthenticated(true);
         } catch (err) {
           console.error('Failed to fetch user:', err);

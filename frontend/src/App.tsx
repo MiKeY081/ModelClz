@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ChatAssistant from './components/ChatAssistant';
 import Home from './pages/Home';
 import VirtualTour from './pages/VirtualTour';
 import Dashboard from './pages/Dashboard';
@@ -14,12 +15,23 @@ import Achievements from './pages/Achievements';
 import Assignments from './pages/Assignments';
 import Grades from './pages/Grades';
 import Community from './pages/Community';
-import ChatAssistant from './components/ChatAssistant';
 import ApplicationForm from './pages/ApplicationForm';
 import Courses from './pages/Courses';
 import Students from './pages/Students';
 import Attendance from './pages/Attendance';
 import NotFound from './pages/NotFound';
+import SupportPrivacy from './pages/SupportPrivacy';
+import SupportTerms from './pages/SupportTerms';
+import SupportCookies from './pages/SupportCookies';
+import AboutStory from './pages/AboutStory';
+import AboutMission from './pages/AboutMission';
+import AboutLeadership from './pages/AboutLeadership';
+import AboutCareers from './pages/AboutCarrers';
+import CommunityAlumni from './pages/CommunityAlumini';
+import Support from './pages/Support';
+import SupportFAQ from './pages/SupportFAQ';
+import SupportContact from './pages/SupportContact';
+import SupportFeedback from './pages/SupportFeedback';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -49,6 +61,19 @@ function App() {
               <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
               <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
               <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
+              {/* New Routes */}
+              <Route path="/support/privacy" element={<SupportPrivacy />} />
+              <Route path="/support/terms" element={<SupportTerms />} />
+              <Route path="/support/cookies" element={<SupportCookies />} />
+              <Route path="/about/story" element={<AboutStory />} />
+              <Route path="/about/mission" element={<AboutMission />} />
+              <Route path="/about/leadership" element={<AboutLeadership />} />
+              <Route path="/about/careers" element={<AboutCareers />} />
+              <Route path="/community/alumni" element={<ProtectedRoute><CommunityAlumni /></ProtectedRoute>} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/support/faq" element={<SupportFAQ />} />
+              <Route path="/support/contact" element={<SupportContact />} />
+              <Route path="/support/feedback" element={<SupportFeedback />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

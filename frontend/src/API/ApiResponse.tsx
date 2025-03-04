@@ -147,6 +147,7 @@ export const createAssignment = async (data: Partial<Assignment>) => {
 export const getAssignments = async () => {
   try {
     const response: AxiosResponse<ApiResponse<Assignment[]>> = await api.get('/assignments');
+   
     return response.data;
   } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
 };
@@ -640,4 +641,59 @@ export const deleteTeacherSubject = async (id: string) => {
 
 export const logout = () => {
   localStorage.removeItem('token');
+};
+
+
+
+//static props 
+
+// export const getAssignments = async () => ({ data: [/* your static assignments */] });
+export const getMessages = async () => ({ data: [/* your static messages */] });
+export const getEvents = async () => ({
+  data: [
+    { id: '1', title: 'Annual Science Fair', type: 'academic', date: '2024-03-15', time: '09:00 AM', location: 'Main Auditorium', image: 'https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=800', isLive: true },
+    // Add your static events here
+  ]
+});
+
+export const getLibraryBooks = async () => ({
+  data: [
+    { id: '1', title: 'Advanced Mathematics', author: 'Dr. Sarah Johnson', category: 'textbooks', cover: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400', rating: 4.5, available: true },
+    // Add your static books here
+  ]
+});
+
+export const getLibraryHistory = async () => ({
+  data: [
+    { id: '1', title: 'Advanced Mathematics', author: 'Dr. Sarah Johnson', borrowDate: '2024-02-15', returnDate: '2024-03-01', status: 'returned', cover: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400' },
+    // Add your static history here
+  ]
+});
+
+
+// export const getAchievements = async () => ({
+//   data: [
+//     {
+//       id: '1',
+//       title: 'National Science Olympiad',
+//       achiever: { name: 'Sarah Johnson', role: 'student', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200' },
+//       date: 'March 2024',
+//       category: 'academic',
+//       description: 'First place in the National Science Olympiad, representing excellence in scientific innovation.',
+//       badge: 'gold',
+//     },
+//     // Add your static achievements here
+//   ]
+// });
+
+// export const getMessages = async () => ({
+//   data: [
+//     { id: '1', type: 'event', title: 'Science Fair Tomorrow', message: 'Don\'t forget to attend at 9 AM.', time: '2 hours ago', read: false },
+//     // Add your static notifications here
+//   ]
+// });
+
+export const markMessagesAsRead = async () => {
+  console.log('Marked all as read');
+  return { success: true };
 };

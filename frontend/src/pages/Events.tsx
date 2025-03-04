@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, useAnimation } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import {
-  Calendar,
+  Calendar as CalendarIcon,
   Video,
   Users,
   Trophy,
@@ -9,202 +10,249 @@ import {
   Star,
   Play,
   Clock,
-  MapPin
+  MapPin,
+  ChevronRight,
 } from 'lucide-react';
+import { useInView } from 'react-intersection-observer';
+import { useAuth } from '../context/AuthContext';
+import { getEvents } from '../API/ApiResponse';
 
-function Events() {
+interface Event {
+  id: string;
+  title: string;
+  type: 'academic' | 'sports' | 'cultural' | 'meeting';
+  date: string;
+  time: string;
+  location: string;
+  image: string;
+  isLive?: boolean;
+}
+
+const Events: React.FC = () => {
+  const { user, isAuthenticated } = useAuth();
   const [filter, setFilter] = useState('all');
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
 
-  const events = [
-    {
-      id: 1,
-      title: 'Annual Science Fair',
-      type: 'academic',
-      date: '2024-03-15',
-      time: '09:00 AM',
-      location: 'Main Auditorium',
-      image: 'https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=800',
-      isLive: true
-    },
-    {
-      id: 2,
-      title: 'Sports Day',
-      type: 'sports',
-      date: '2024-03-20',
-      time: '10:00 AM',
-      location: 'Sports Complex',
-      image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800'
-    },
-    {
-      id: 3,
-      title: 'Cultural Evening',
-      type: 'cultural',
-      date: '2024-03-25',
-      time: '06:00 PM',
-      location: 'Performing Arts Center',
-      image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800'
-    },
-    {
-      id: 4,
-      title: 'Parent-Teacher Meeting',
-      type: 'meeting',
-      date: '2024-03-30',
-      time: '02:00 PM',
-      location: 'Conference Hall',
-      image: 'https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?auto=format&fit=crop&w=800'
-    }
-  ];
+  // Animation controls
+  const controls = useAnimation();
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await getEvents();
+        console.log('Events fetched:', response.data);
+        setEvents(response.data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    if (inView) controls.start('visible');
+  }, [controls, inView]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
 
   const filteredEvents = filter === 'all' ? events : events.filter(event => event.type === filter);
+  const liveEvent = events.find(event => event.isLive);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12 bg-gray-50 min-h-screen px-6 py-8 md:px-12">
       {/* Header */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">School Events</h1>
-            <p className="text-gray-600">Stay updated with all our upcoming events and activities</p>
-          </div>
-          <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
-            Add to Calendar
-          </button>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white rounded-3xl shadow-xl p-8 flex flex-col md:flex-row justify-between items-center"
+      >
+        <div className="mb-4 md:mb-0">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Homies Events</h1>
+          <p className="text-gray-600 text-lg">What’s poppin’, homie? Catch all the action here!</p>
         </div>
-      </div>
+        <Link
+          to={isAuthenticated ? "/dashboard" : "/auth"}
+          className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold shadow-md hover:bg-blue-700 transition flex items-center gap-2"
+        >
+          <CalendarIcon className="w-5 h-5" />
+          {isAuthenticated ? "Back to Dashboard" : "Join the Homies"}
+        </Link>
+      </motion.div>
 
       {/* Live Event Banner */}
-      {events.some(event => event.isLive) && (
+      {liveEvent && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-red-600 to-red-500 rounded-2xl shadow-lg p-6 text-white"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          className="bg-gradient-to-r from-red-600 to-red-500 rounded-3xl shadow-2xl p-8 text-white"
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="animate-pulse">
+          <div className="flex items-center gap-3 mb-4">
+            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }}>
               <Video className="w-6 h-6" />
-            </div>
-            <span className="font-semibold">LIVE NOW</span>
+            </motion.div>
+            <span className="font-semibold text-lg">LIVE NOW</span>
           </div>
-          <h2 className="text-2xl font-bold mb-4">Annual Science Fair</h2>
-          <button className="px-6 py-2 bg-white text-red-600 rounded-lg hover:bg-gray-100 transition flex items-center gap-2">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 drop-shadow-md">{liveEvent.title}</h2>
+          <div className="flex items-center gap-4 text-sm">
+            <span>{liveEvent.date} • {liveEvent.time}</span>
+            <span>{liveEvent.location}</span>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-6 px-6 py-2 bg-white text-red-600 rounded-full font-semibold shadow-lg hover:bg-gray-100 transition flex items-center gap-2"
+          >
             <Play className="w-5 h-5" />
             Join Stream
-          </button>
+          </motion.button>
         </motion.div>
       )}
 
       {/* Filters */}
-      <div className="flex gap-4 overflow-x-auto pb-2">
-        <FilterButton
-          active={filter === 'all'}
-          onClick={() => setFilter('all')}
-          icon={<Star className="w-4 h-4" />}
-          label="All Events"
-        />
-        <FilterButton
-          active={filter === 'academic'}
-          onClick={() => setFilter('academic')}
-          icon={<Trophy className="w-4 h-4" />}
-          label="Academic"
-        />
-        <FilterButton
-          active={filter === 'sports'}
-          onClick={() => setFilter('sports')}
-          icon={<Users className="w-4 h-4" />}
-          label="Sports"
-        />
-        <FilterButton
-          active={filter === 'cultural'}
-          onClick={() => setFilter('cultural')}
-          icon={<Music className="w-4 h-4" />}
-          label="Cultural"
-        />
-      </div>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-wrap justify-center gap-4 overflow-x-auto pb-2 max-w-4xl mx-auto"
+      >
+        {[
+          { value: 'all', label: 'All Events', icon: <Star /> },
+          { value: 'academic', label: 'Academic', icon: <Trophy /> },
+          { value: 'sports', label: 'Sports', icon: <Users /> },
+          { value: 'cultural', label: 'Cultural', icon: <Music /> },
+          { value: 'meeting', label: 'Meetings', icon: <CalendarIcon /> },
+        ].map((f) => (
+          <FilterButton
+            key={f.value}
+            active={filter === f.value}
+            onClick={() => setFilter(f.value)}
+            icon={f.icon}
+            label={f.label}
+          />
+        ))}
+      </motion.div>
 
       {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredEvents.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="text-center text-gray-600">Loading events, homie...</div>
+      ) : error ? (
+        <div className="text-center text-red-500">{error}</div>
+      ) : (
+        <motion.div
+          ref={ref}
+          variants={containerVariants}
+          initial="hidden"
+          animate={controls}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {filteredEvents.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </motion.div>
+      )}
     </div>
   );
-}
+};
 
-function FilterButton({ active, onClick, icon, label }: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition whitespace-nowrap ${
-        active
-          ? 'bg-blue-600 text-white'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-      }`}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
+const FilterButton: React.FC<{ active: boolean; onClick: () => void; icon: React.ReactNode; label: string }> = ({ active, onClick, icon, label }) => (
+  <motion.button
+    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={onClick}
+    className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition shadow-md whitespace-nowrap ${
+      active ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }`}
+  >
+    {icon}
+    {label}
+  </motion.button>
+);
 
-function EventCard({ event }: { event: any }) {
-  return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      className="bg-white rounded-xl shadow-lg overflow-hidden"
-    >
-      <div className="relative h-48">
-        <img
-          src={event.image}
-          alt={event.title}
-          className="w-full h-full object-cover"
-        />
-        {event.isLive && (
-          <div className="absolute top-4 left-4 px-3 py-1 bg-red-600 text-white rounded-full flex items-center gap-2">
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-            LIVE
-          </div>
+const EventCard: React.FC<{ event: Event }> = ({ event }) => (
+  <motion.div
+    whileHover={{ y: -10, boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)' }}
+    className="bg-white rounded-2xl shadow-md overflow-hidden"
+  >
+    <motion.img
+      src={event.image}
+      alt={event.title}
+      className="w-full h-48 object-cover"
+      whileHover={{ scale: 1.05 }}
+      transition={{ duration: 0.3 }}
+    />
+    {event.isLive && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="absolute top-4 left-4 px-3 py-1 bg-red-600 text-white rounded-full flex items-center gap-2 shadow-md"
+      >
+        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1, repeat: Infinity }}>
+          <div className="w-2 h-2 bg-white rounded-full" />
+        </motion.div>
+        LIVE
+      </motion.div>
+    )}
+    <div className="p-6">
+      <h3 className="text-xl font-semibold text-gray-800 mb-2">{event.title}</h3>
+      <div className="space-y-1 text-gray-600 text-sm">
+        <div className="flex items-center gap-2">
+          <CalendarIcon className="w-4 h-4" />
+          <span>{event.date}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Clock className="w-4 h-4" />
+          <span>{event.time}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          <span>{event.location}</span>
+        </div>
+      </div>
+      <div className="mt-4 flex gap-3">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition"
+        >
+          Register
+        </motion.button>
+        {event.isLive ? (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-4 py-2 bg-red-100 text-red-600 rounded-full font-semibold hover:bg-red-200 transition"
+          >
+            Join
+          </motion.button>
+        ) : (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-4 py-2 bg-gray-100 text-gray-600 rounded-full font-semibold hover:bg-gray-200 transition"
+          >
+            Remind
+          </motion.button>
         )}
       </div>
-      <div className="p-6">
-        <h3 className="text-xl font-semibold mb-2">{event.title}</h3>
-        <div className="space-y-2 text-gray-600">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span>{event.date}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            <span>{event.time}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            <span>{event.location}</span>
-          </div>
-        </div>
-        <div className="mt-4 flex gap-2">
-          <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-            Register
-          </button>
-          {event.isLive ? (
-            <button className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
-              Join
-            </button>
-          ) : (
-            <button className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition">
-              Remind
-            </button>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+    </div>
+  </motion.div>
+);
 
 export default Events;

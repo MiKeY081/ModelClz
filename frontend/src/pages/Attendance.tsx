@@ -25,7 +25,8 @@ const Attendance: React.FC = () => {
       try {
         setLoading(true);
         const response = await getAttendance();
-        setAttendanceRecords(response.data);
+        setAttendanceRecords(response);
+        console.log(response)
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -67,7 +68,7 @@ const Attendance: React.FC = () => {
         <p className="text-red-300 text-center">{error}</p>
       ) : (
         <div className="space-y-4 max-w-2xl mx-auto">
-          {attendanceRecords.map((record, index) => (
+          {attendanceRecords?.map((record, index) => (
             <motion.div
               key={record.id}
               initial={{ opacity: 0, y: 20 }}

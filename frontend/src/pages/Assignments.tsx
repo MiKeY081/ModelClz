@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Calendar, Clock, CheckCircle, XCircle, AlertCircle, Filter, Search, ChevronDown, Upload, Star } from 'lucide-react';
+import { getAssignments } from '@/API/ApiResponse';
 
 interface Assignment {
   id: number;
@@ -16,39 +17,54 @@ interface Assignment {
 function Assignments() {
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-
-  const assignments: Assignment[] = [
-    {
-      id: 1,
-      title: "Advanced Calculus Problem Set",
-      subject: "Mathematics",
-      description: "Complete problems 1-20 from Chapter 5: Differential Equations",
-      dueDate: "2024-03-20",
-      status: "pending",
-      type: "homework",
-      points: 100
-    },
-    {
-      id: 2,
-      title: "Physics Lab Report: Wave Motion",
-      subject: "Physics",
-      description: "Write a detailed report on the wave motion experiments conducted in lab",
-      dueDate: "2024-03-18",
-      status: "completed",
-      type: "project",
-      points: 150
-    },
-    {
-      id: 3,
-      title: "Literature Analysis Essay",
-      subject: "English",
-      description: "Write a 1000-word analysis of Shakespeare's Macbeth",
-      dueDate: "2024-03-15",
-      status: "overdue",
-      type: "homework",
-      points: 100
-    }
-  ];
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getAssignments(); // No need for Promise.resolve
+        setAssignments(response);
+        console.log(response);
+      } catch (err) {
+        console.error("Error fetching assignments:", err);
+      }
+    };
+  
+    fetchData();
+  }, []); // Runs only once on mount
+  
+  // const assignments: Assignment[] = [
+  //   {
+  //     id: 1,
+  //     title: "Advanced Calculus Problem Set",
+  //     subject: "Mathematics",
+  //     description: "Complete problems 1-20 from Chapter 5: Differential Equations",
+  //     dueDate: "2024-03-20",
+  //     status: "pending",
+  //     type: "homework",
+  //     points: 100
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Physics Lab Report: Wave Motion",
+  //     subject: "Physics",
+  //     description: "Write a detailed report on the wave motion experiments conducted in lab",
+  //     dueDate: "2024-03-18",
+  //     status: "completed",
+  //     type: "project",
+  //     points: 150
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Literature Analysis Essay",
+  //     subject: "English",
+  //     description: "Write a 1000-word analysis of Shakespeare's Macbeth",
+  //     dueDate: "2024-03-15",
+  //     status: "overdue",
+  //     type: "homework",
+  //     points: 100
+  //   }
+  // ];
 
   const filteredAssignments = assignments.filter(assignment => 
     (filter === 'all' || assignment.status === filter) &&
@@ -182,7 +198,7 @@ function AssignmentCard({ assignment }: { assignment: Assignment }) {
           </div>
           <span className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${statusColors[assignment.status]}`}>
             {statusIcons[assignment.status]}
-            {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+            {assignment.status?.charAt(0).toUpperCase() + assignment.status?.slice(1)}
           </span>
         </div>
         

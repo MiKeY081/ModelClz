@@ -1,5 +1,6 @@
 # ModelClz
 
+
 ```
 ClzModel
 ├─ 📁backend
@@ -52,14 +53,25 @@ ClzModel
 │  │  ├─ 📁components
 │  │  │  ├─ 📄AuthModal.tsx
 │  │  │  ├─ 📄ChatAssistant.tsx
+│  │  │  ├─ 📄ErrorBoundary.tsx
 │  │  │  ├─ 📄Footer.tsx
+│  │  │  ├─ 📄LoadingSpinner.tsx
 │  │  │  ├─ 📄Navbar.tsx
 │  │  │  └─ 📄NotificationsModal.tsx
+│  │  ├─ 📁context
+│  │  │  └─ 📄AuthContext.tsx
 │  │  ├─ 📁pages
+│  │  │  ├─ 📄AboutCarrers.tsx
+│  │  │  ├─ 📄AboutLeadership.tsx
+│  │  │  ├─ 📄AboutMission.tsx
+│  │  │  ├─ 📄AboutStory.tsx
 │  │  │  ├─ 📄Achievements.tsx
 │  │  │  ├─ 📄ApplicationForm.tsx
 │  │  │  ├─ 📄Assignments.tsx
+│  │  │  ├─ 📄Attendance.tsx
 │  │  │  ├─ 📄Community.tsx
+│  │  │  ├─ 📄CommunityAlumini.tsx
+│  │  │  ├─ 📄Courses.tsx
 │  │  │  ├─ 📄Dashboard.tsx
 │  │  │  ├─ 📄Events.tsx
 │  │  │  ├─ 📄Grades.tsx
@@ -67,6 +79,15 @@ ClzModel
 │  │  │  ├─ 📄Library.tsx
 │  │  │  ├─ 📄LibraryHistory.tsx
 │  │  │  ├─ 📄MyLibrary.tsx
+│  │  │  ├─ 📄NotFound.tsx
+│  │  │  ├─ 📄Students.tsx
+│  │  │  ├─ 📄Support.tsx
+│  │  │  ├─ 📄SupportContact.tsx
+│  │  │  ├─ 📄SupportCookies.tsx
+│  │  │  ├─ 📄SupportFAQ.tsx
+│  │  │  ├─ 📄SupportFeedback.tsx
+│  │  │  ├─ 📄SupportPrivacy.tsx
+│  │  │  ├─ 📄SupportTerms.tsx
 │  │  │  └─ 📄VirtualTour.tsx
 │  │  ├─ 📁types
 │  │  │  └─ 📄index.ts
@@ -74,6 +95,7 @@ ClzModel
 │  │  ├─ 📄index.css
 │  │  ├─ 📄main.tsx
 │  │  └─ 📄vite-env.d.ts
+│  ├─ 📄.env
 │  ├─ 📄.gitignore
 │  ├─ 📄eslint.config.js
 │  ├─ 📄index.html

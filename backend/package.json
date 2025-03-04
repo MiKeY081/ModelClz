@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "ts-node ./index.ts nodemon",
     "build": "tsc",
-    "start": "ts-node ./index.ts nodemon"
+    "start": "ts-node ./index.ts nodemon",
+      "faker": "ts-node ./faker.js"
   },
   "dependencies": {
     "@faker-js/faker": "^9.5.1",
