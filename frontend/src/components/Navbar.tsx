@@ -84,7 +84,7 @@ function Navbar() {
               <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
                 <GraduationCap className="h-8 w-8 text-blue-600" />
               </motion.div>
-              <span className="ml-2 text-xl font-bold text-gray-900">EduExcel</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">Homies</span>
             </Link>
           </div>
 
