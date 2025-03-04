@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Menu, X, GraduationCap, Bell, User } from 'lucide-react';
@@ -14,9 +14,10 @@ function Navbar() {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
 
-  console.log(user, isAuthenticated);
+  useEffect(() => {
+    console.log('Navbar auth state:', { user, isAuthenticated });
+  }, [user, isAuthenticated]);
 
-  // Sample notifications (replace with backend later if needed)
   const notifications = [
     { id: 1, type: 'event', title: 'Science Fair Tomorrow', message: 'Don\'t forget to attend at 9 AM.', time: '2 hours ago', read: false },
     { id: 2, type: 'achievement', title: 'New Achievement Unlocked', message: 'Perfect Attendance badge earned!', time: '1 day ago', read: true },
@@ -55,14 +56,18 @@ function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
-    logout(); // Just clears auth state—no navigation needed
-    setIsOpen(false); // Close mobile menu if open
+    logout();
+    setIsOpen(false);
   };
 
   const handleAuthToggle = (mode: 'login' | 'register') => {
     setAuthMode(mode);
     setShowAuthModal(true);
-    setIsOpen(false); // Close mobile menu if open
+    setIsOpen(false);
+  };
+
+  const toggleAuthMode = () => {
+    setAuthMode(prevMode => (prevMode === 'login' ? 'register' : 'login'));
   };
 
   return (
@@ -83,7 +88,6 @@ function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:space-x-4">
             {navigation
               .filter(item => item.public || isAuthenticated)
@@ -148,7 +152,6 @@ function Navbar() {
             </div>
           </div>
 
-          {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
             <motion.button
               whileTap={{ scale: 0.9 }}
@@ -161,7 +164,6 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {isOpen && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -251,6 +253,7 @@ function Navbar() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         mode={authMode}
+        onToggleMode={toggleAuthMode} // Pass the toggle function
       />
     </motion.nav>
   );

@@ -21,32 +21,6 @@ declare global {
   }
 }
 
-export const protect = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-
-    if (!token) {
-      throw new AuthError('Not authorized, no token');
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: { id: true, role: true }
-    });
-
-    if (!user) {
-      throw new AuthError('Not authorized, user not found');
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const authorize = (...roles: Role[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -54,4 +28,24 @@ export const authorize = (...roles: Role[]) => {
     }
     next();
   };
+};
+
+export const protect = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    console.log('Token:', token); // Debug
+    if (!token) throw new AuthError('Not authorized, no token');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    console.log('Decoded:', decoded); // Debug
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, role: true },
+    });
+    console.log('User:', user); // Debug
+    if (!user) throw new AuthError('Not authorized, user not found');
+    req.user = user;
+    next();
+  } catch (error) {
+    next(error);
+  }
 };

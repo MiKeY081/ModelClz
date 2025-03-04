@@ -2,6 +2,7 @@ import axios, { AxiosResponse, AxiosError } from 'axios';
 
 const BASE_URL = 'http://localhost:5002/api';
 
+
 interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -42,6 +43,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  console.log('Request headers:', config.headers); // Debug
   return config;
 });
 
@@ -58,7 +60,7 @@ const handleError = (error: AxiosError<ErrorResponse>) => {
 };
 
 // Auth
-export const register = async (data: { email: string; password: string; firstName: string; lastName: string }) => {
+export const register = async (data: { email: string; password: string; firstName: string; lastName: string, role:Role }) => {
   try {
     const response: AxiosResponse<ApiResponse<User>> = await api.post('/auth/register', data);
     return response.data;
@@ -91,9 +93,11 @@ export const updateProfile = async (data: Partial<User>) => {
 
 export const getUsers = async () => {
   try {
-    const response: AxiosResponse<ApiResponse<User[]>> = await api.get('/users');
+    const response = await api.get('/users');
     return response.data;
-  } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
+  } catch (error) {
+    handleError(error as AxiosError<ErrorResponse>);
+  }
 };
 
 // Courses
@@ -311,7 +315,6 @@ export const deleteAchievement = async (id: string) => {
     return response.data;
   } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
 };
-
 // Students
 export const getStudents = async () => {
   try {
@@ -320,18 +323,17 @@ export const getStudents = async () => {
   } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
 };
 
-export const createStudent = async (data: Partial<Student>) => {
-  try {
-    const response: AxiosResponse<ApiResponse<Student>> = await api.post('/students', data);
-    return response.data;
-  } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
-};
 
-export const getStudent = async (id: string) => {
+
+
+export const createStudent = async (data: { firstName: string; lastName: string; rollNumber: string; grade: number; section: string; parentId?: string }) => {
   try {
-    const response: AxiosResponse<ApiResponse<Student>> = await api.get(`/students/${id}`);
+    const response = await api.post('/students', data);
+    console.log('Create student response:', response);
     return response.data;
-  } catch (error) { handleError(error as AxiosError<ErrorResponse>); }
+  } catch (error) {
+    handleError(error as AxiosError<ErrorResponse>);
+  }
 };
 
 export const updateStudent = async (id: string, data: Partial<Student>) => {

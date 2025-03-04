@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { X, Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { login as apiLogin, register } from '../API/ApiResponse';
-import { Role } from '../types';
+import { Role, User } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   mode: 'login' | 'register';
+  onToggleMode?: () => void; // New prop to toggle mode
 }
 
-function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
+function AuthModal({ isOpen, onClose, mode, onToggleMode }: AuthModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,12 +33,17 @@ function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
     try {
       if (mode === 'login') {
         const response = await apiLogin({ email, password });
-        setUser(response); // Update context
-        navigate('/dashboard'); // Navigate after login
+        console.log('Login response:', response);
+        const userData: User = response || response.data;
+        setUser(userData);
+        navigate('/dashboard');
       } else {
-        const response = await register({ email, password, firstName, lastName });
-        const loginResponse = await apiLogin({ email, password }); // Auto-login
-        setUser(loginResponse); // Update context
+        const registerResponse = await register({ email, password, firstName, lastName, role });
+        console.log('Register response:', registerResponse);
+        const loginResponse = await apiLogin({ email, password });
+        console.log('Login after register:', loginResponse);
+        const userData: User = loginResponse || loginResponse.data;
+        setUser(userData);
         navigate('/dashboard');
       }
       onClose();
@@ -144,6 +150,31 @@ function AuthModal({ isOpen, onClose, mode }: AuthModalProps) {
           </button>
         </form>
         {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
+        <div className="mt-4 text-center text-sm text-gray-600">
+          {mode === 'login' ? (
+            <>
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={onToggleMode}
+                className="text-blue-600 hover:underline"
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{' '}
+              <button
+                type="button"
+                onClick={onToggleMode}
+                className="text-blue-600 hover:underline"
+              >
+                Sign In
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

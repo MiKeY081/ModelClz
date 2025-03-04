@@ -1,63 +1,78 @@
 import { Router } from 'express';
 import { PrismaClient, Role } from '@prisma/client';
 import { protect, authorize } from '../middleware/authMiddleware';
-import { NotFoundError } from '../utils/errors';
+import { ValidationError } from '../utils/errors';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 const router = Router();
 
-// Get all students (Admin only)
+router.post('/', protect, authorize(Role.ADMIN), async (req, res, next) => {
+  try {
+    const { firstName, lastName, rollNumber, grade, section, parentId } = req.body;
+    console.log('Creating student with:', { firstName, lastName, rollNumber, grade, section, parentId });
+
+    // Generate email and password
+    const email = `${firstName.toLowerCase()}.${rollNumber.toLowerCase()}@gmail.com`;
+    const password = `${firstName.toLowerCase()}@123`;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Check rollNumber uniqueness
+    const rollNumberExists = await prisma.student.findUnique({ where: { rollNumber } });
+    if (rollNumberExists) {
+      throw new ValidationError('Roll number already in use');
+    }
+
+    // Check parentId if provided
+    if (parentId) {
+      const parentExists = await prisma.parent.findUnique({ where: { id: parentId } });
+      if (!parentExists) {
+        throw new ValidationError('Parent not found for given parentId');
+      }
+    }
+
+    // Create User and Student in a transaction
+    const student = await prisma.$transaction(async (prisma) => {
+      // Step 1: Create User
+      const user = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          firstName,
+          lastName,
+          role: Role.STUDENT,
+        },
+      });
+
+      // Step 2: Create Student with the User's ID directly
+      return prisma.student.create({
+        data: {
+          userId: user.id, // Direct from user creation
+          grade,
+          section,
+          rollNumber,
+          parentId: parentId || undefined,
+        },
+      });
+    });
+
+    console.log('New student created:', student);
+    res.status(201).json({ success: true, data: student });
+  } catch (error) {
+    console.error('Error creating student:', error);
+    next(error);
+  }
+});
+
 router.get('/', protect, authorize(Role.ADMIN), async (req, res, next) => {
   try {
-    const students = await prisma.student.findMany();
+    const students = await prisma.student.findMany({
+      include: { user: true }, // Include User data
+    });
     res.json({ success: true, data: students });
   } catch (error) {
     next(error);
   }
 });
 
-// Create a student (Admin only)
-router.post('/', protect, authorize(Role.ADMIN), async (req, res, next) => {
-  try {
-    const student = await prisma.student.create({ data: req.body });
-    res.status(201).json({ success: true, data: student });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Get a student by ID
-router.get('/:id', protect, async (req, res, next) => {
-  try {
-    const student = await prisma.student.findUnique({ where: { id: req.params.id } });
-    if (!student) throw new NotFoundError('Student not found');
-    res.json({ success: true, data: student });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Update a student (Admin only)
-router.put('/:id', protect, authorize(Role.ADMIN), async (req, res, next) => {
-  try {
-    const student = await prisma.student.update({
-      where: { id: req.params.id },
-      data: req.body,
-    });
-    res.json({ success: true, data: student });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Delete a student (Admin only)
-router.delete('/:id', protect, authorize(Role.ADMIN), async (req, res, next) => {
-  try {
-    await prisma.student.delete({ where: { id: req.params.id } });
-    res.json({ success: true, data: null });
-  } catch (error) {
-    next(error);
-  }
-});
-
-export {router as studentRoutes};
+export { router as studentRoutes };

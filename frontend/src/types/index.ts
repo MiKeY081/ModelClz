@@ -34,6 +34,7 @@ export interface User {
 export interface Student {
   id: string;
   userId: string;
+  user?: User; // Optional relation
   grade: number;
   section: string;
   rollNumber: string;

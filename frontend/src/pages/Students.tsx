@@ -5,7 +5,14 @@ import { Student } from '../types';
 
 const Students: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
-  const [newStudent, setNewStudent] = useState({ userId: '', grade: 0, section: '', rollNumber: '' });
+  const [newStudent, setNewStudent] = useState({
+    firstName: '',
+    lastName: '',
+    rollNumber: '',
+    grade: 0,
+    section: '',
+    parentId: '',
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
@@ -14,6 +21,7 @@ const Students: React.FC = () => {
       try {
         setLoading(true);
         const response = await getStudents();
+        console.log('Students fetched:', response.data);
         setStudents(response.data);
       } catch (err) {
         setError((err as Error).message);
@@ -27,10 +35,13 @@ const Students: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      console.log('Submitting new student:', newStudent);
       const response = await createStudent(newStudent);
+      console.log('Create student response:', response);
       setStudents([...students, response.data]);
-      setNewStudent({ userId: '', grade: 0, section: '', rollNumber: '' });
+      setNewStudent({ firstName: '', lastName: '', rollNumber: '', grade: 0, section: '', parentId: '' });
     } catch (err) {
+      console.error('Create student error:', err);
       setError((err as Error).message);
     }
   };
@@ -71,7 +82,7 @@ const Students: React.FC = () => {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                {student.firstName?.charAt(0) || 'S'}
+                {student.user?.firstName?.charAt(0) || 'S'} {/* Access via user relation */}
               </motion.div>
               <div>
                 <h3 className="text-lg font-semibold text-teal-700">{student.rollNumber}</h3>
@@ -92,9 +103,25 @@ const Students: React.FC = () => {
         <h3 className="text-lg font-bold text-teal-700 mb-4">Add New Student</h3>
         <input
           type="text"
-          placeholder="User ID"
-          value={newStudent.userId}
-          onChange={(e) => setNewStudent({ ...newStudent, userId: e.target.value })}
+          placeholder="First Name"
+          value={newStudent.firstName}
+          onChange={(e) => setNewStudent({ ...newStudent, firstName: e.target.value })}
+          className="w-full p-2 mb-4 border rounded-md"
+          required
+        />
+        <input
+          type="text"
+          placeholder="Last Name"
+          value={newStudent.lastName}
+          onChange={(e) => setNewStudent({ ...newStudent, lastName: e.target.value })}
+          className="w-full p-2 mb-4 border rounded-md"
+          required
+        />
+        <input
+          type="text"
+          placeholder="Roll Number"
+          value={newStudent.rollNumber}
+          onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
           className="w-full p-2 mb-4 border rounded-md"
           required
         />
@@ -116,11 +143,10 @@ const Students: React.FC = () => {
         />
         <input
           type="text"
-          placeholder="Roll Number"
-          value={newStudent.rollNumber}
-          onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
+          placeholder="Parent ID (optional)"
+          value={newStudent.parentId}
+          onChange={(e) => setNewStudent({ ...newStudent, parentId: e.target.value })}
           className="w-full p-2 mb-4 border rounded-md"
-          required
         />
         <motion.button
           whileHover={{ scale: 1.1, boxShadow: '0 0 15px rgba(0,0,0,0.2)' }}
