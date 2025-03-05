@@ -27,10 +27,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin:'*',
+  origin: [
+    "https://homie-clz.vercel.app",
+    "http://localhost:5002"
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.options('*', cors());
