@@ -8,6 +8,6 @@
     "rootDir": ".",                     // Root directory for source files
     "strict": true                      // Enable strict type checking
   },
-  "include": ["**/*.ts", "faker.js"],  // Include all .ts files in the project
+  "include": ["**/*.ts", "faker.js", "seed.js"],  // Include all .ts files in the project
   "exclude": ["node_modules"]  // Exclude the node_modules directory
 }

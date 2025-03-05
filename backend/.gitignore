@@ -2,3 +2,6 @@ node_modules
 .env
 ./node_modules
 ./.env
+faker.js
+
+seed.js
