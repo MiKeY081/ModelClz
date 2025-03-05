@@ -32,6 +32,8 @@ app.use(cors({
     "http://localhost:5002"
   ],
   credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE"]
 }));
 
 app.options('*', cors());
@@ -40,9 +42,10 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
-app.get('/api', (req, res) => {
-  res.send('API is running smoothly');
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
