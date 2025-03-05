@@ -70,7 +70,7 @@ app.use('/api/teacher-subjects', teacherSubjectRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5002;
+const PORT = "https://homie-server.vercel.app"
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
